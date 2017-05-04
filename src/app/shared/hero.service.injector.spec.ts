@@ -25,7 +25,9 @@ describe('HeroService', () => {
     it('should return a promise to heroes retrieved via HTTP (using done)', fakeAsync(() => {
       const expectedHeroes = [ {id: 2, name: 'Rubberman'}, {id: 4, name: 'Dynama'} ];
       let actualHeroes: Hero[];
+
       service.getHeroes().then(response => actualHeroes = response);
+
       expect(backend.connectionsArray[0].request.url).toEqual('api/heroes');
       backend.connectionsArray[0].mockRespond(new Response(new ResponseOptions({
          body: JSON.stringify({data: expectedHeroes}),

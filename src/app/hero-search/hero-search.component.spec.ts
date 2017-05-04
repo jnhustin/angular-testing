@@ -1,34 +1,45 @@
-import { ReflectiveInjector } from '@angular/core';
-import { fakeAsync, tick } from '@angular/core/testing';
+import {async, fakeAsync, tick, TestBed, ComponentFixture} from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs/observable';
 import { of as observableOf } from 'rxjs/observable/of';
 import { Hero } from 'app/shared/hero';
 import { HeroSearchService } from './hero-search.service';
 import { HeroSearchComponent } from './hero-search.component';
+import {Http} from '@angular/http';
 
 class MockHeroSearchService {
-  heroes: Hero[];
+  constructor(public heroes) {}
   search(term: string): Observable<Hero[]> {
+    console.log('Got search ', this.heroes);
     return observableOf(this.heroes);
   }
 }
 
 describe('HeroSearchService', () => {
-  let injector: ReflectiveInjector;
+  let fixture: ComponentFixture<HeroSearchComponent>;
   let component: HeroSearchComponent;
   let searchService: MockHeroSearchService;
   let heroes: Hero[];
 
-  beforeEach(() => {
+  beforeEach(async(() => {
     heroes = [ {id: 2, name: 'Rubberman'}, {id: 4, name: 'Dynama'} ];
-    injector = ReflectiveInjector.resolveAndCreate([
-      { provide: HeroSearchService, useClass: MockHeroSearchService },
-      { provide: Router, useValue: {}},
-      HeroSearchComponent,
-    ]);
-    component = injector.get(HeroSearchComponent);
-    searchService = injector.get(HeroSearchService);
+    searchService = new MockHeroSearchService(heroes);
+    TestBed.configureTestingModule({
+      declarations: [
+        HeroSearchComponent
+      ],
+      providers: [
+        { provide: HeroSearchService, useFactory: () => searchService},
+        { provide: Http, useValue: {} },
+        { provide: Router, useValue: {}},
+      ],
+    });
+    TestBed.compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(HeroSearchComponent);
+    component = fixture.componentInstance;
   });
 
   describe('search', () => {

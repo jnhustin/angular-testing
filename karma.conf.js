@@ -39,6 +39,13 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
     autoWatch: true,
     browsers: ['Chrome'],
+ 	  // Chrome can run headless
+    customLaunchers: {
+      Chrome_headless: {
+        base: 'Chrome',
+        flags: ['--headless', '--disable-gpu', '--window-size=800,600']
+      }
+    },
     singleRun: false
   });
 };
